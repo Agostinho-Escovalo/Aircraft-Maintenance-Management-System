@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Редактировать обслуживание</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Дата</label>
+        <input type="text" class="form-control" value="{{ record.maintenance_date }}" disabled>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Самолёт</label>
+        <input type="text" class="form-control" value="{{ record.aircraft.registration_number if record.aircraft else '—' }}" disabled>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Работа</label>
+        <input type="text" class="form-control" value="{{ record.work_order.work_name if record.work_order else '—' }}" disabled>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Текущий статус</label>
+        <select name="status" class="form-select" required>
+            <option value="Scheduled" {% if record.status == 'Scheduled' %}selected{% endif %}>Запланировано</option>
+            <option value="In Progress" {% if record.status == 'In Progress' %}selected{% endif %}>В работе</option>
+            <option value="Completed" {% if record.status == 'Completed' %}selected{% endif %}>Завершено</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{{ url_for('maintenance.list_maintenance') }}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

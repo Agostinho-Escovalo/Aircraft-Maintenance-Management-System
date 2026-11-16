@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>История обслуживания</h2>
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+        <select name="status" class="form-select">
+            <option value="">Любой статус</option>
+            <option value="Scheduled" {% if request_args.status == 'Scheduled' %}selected{% endif %}>Запланировано</option>
+            <option value="In Progress" {% if request_args.status == 'In Progress' %}selected{% endif %}>В работе</option>
+            <option value="Completed" {% if request_args.status == 'Completed' %}selected{% endif %}>Завершено</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input type="text" name="airline" class="form-control" placeholder="Авиакомпания"
+               value="{{ request_args.airline }}">
+    </div>
+    <div class="col-md-3">
+        <input type="text" name="work_type" class="form-control" placeholder="Тип работы"
+               value="{{ request_args.work_type }}">
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">Фильтровать</button>
+        <a href="{{ url_for('maintenance.list_maintenance') }}" class="btn btn-secondary ms-1">Сброс</a>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th><a href="?sort=date&order={% if request_args.sort == 'date' and request_args.order == 'desc' %}asc{% else %}desc{% endif %}" class="text-white">
+                Дата {% if request_args.sort == 'date' %}{{ '↓' if request_args.order == 'desc' else '↑' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=aircraft&order={% if request_args.sort == 'aircraft' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Самолёт {% if request_args.sort == 'aircraft' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=work&order={% if request_args.sort == 'work' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Работа {% if request_args.sort == 'work' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=component&order={% if request_args.sort == 'component' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Компонент {% if request_args.sort == 'component' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=status&order={% if request_args.sort == 'status' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Статус {% if request_args.sort == 'status' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mh, aircraft, comp, wo, wt in records %}
+        <tr>
+            <td>{{ mh.maintenance_date }}</td>
+            <td>{{ aircraft.registration_number }} ({{ aircraft.airline }})</td>
+            <td>{{ wo.work_name }} ({{ wt.work_type_name }})</td>
+            <td>{{ comp.serial_number if comp else '—' }}</td>
+            <td>
+                <span class="badge bg-{% if mh.status == 'Completed' %}success{% elif mh.status == 'In Progress' %}warning{% else %}secondary{% endif %}">
+                    {{ mh.status }}
+                </span>
+            </td>
+            <td>
+                <a href="{{ url_for('maintenance.edit_maintenance', id=mh.maintenance_id) }}" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                <form method="post" action="{{ url_for('maintenance.delete_maintenance', id=mh.maintenance_id) }}" style="display:inline;" onsubmit="return confirm('Удалить?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

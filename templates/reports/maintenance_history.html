@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Отчёт: История обслуживания</h2>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <select name="aircraft_id" class="form-select">
+            <option value="">Все самолёты</option>
+            {% for a in aircrafts %}
+            <option value="{{ a.aircraft_id }}" {% if selected == a.aircraft_id %}selected{% endif %}>
+                {{ a.registration_number }} ({{ a.airline }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-primary">Показать</button>
+        <a href="{{ url_for('reports.export_maintenance_csv', aircraft_id=selected) }}" class="btn btn-success" target="_blank">
+            📥 Экспорт в CSV
+        </a>
+    </div>
+</form>
+
+{% if records %}
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Самолёт</th>
+            <th>Работа</th>
+            <th>Компонент</th>
+            <th>Статус</th>
+            <th>Исполнители</th>
+            <th>Запчасти</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in records %}
+        {% set execs = r.executions %}
+        {% set specialists = [] %}
+        {% set parts = [] %}
+        {% for e in execs %}
+            {% if e.specialist %}
+                {% set _ = specialists.append(e.specialist.first_name + ' ' + e.specialist.last_name) %}
+            {% endif %}
+            {% if e.spare_part %}
+                {% set _ = parts.append(e.spare_part.part_number) %}
+            {% endif %}
+        {% endfor %}
+        <tr>
+            <td>{{ r.maintenance_date }}</td>
+            <td>{{ r.aircraft.registration_number if r.aircraft else '—' }}</td>
+            <td>{{ r.work_order.work_name if r.work_order else '—' }}</td>
+            <td>{{ r.component.serial_number if r.component else '—' }}</td>
+            <td>{{ r.status }}</td>
+            <td>{{ specialists | join('; ') or '—' }}</td>
+            <td>{{ parts | join('; ') or '—' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">Нет данных для отображения.</p>
+{% endif %}
+{% endblock %}

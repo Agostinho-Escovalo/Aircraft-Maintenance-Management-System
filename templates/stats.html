@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📊 Статистика системы ТО</h2>
+
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card text-center bg-primary text-white">
+            <div class="card-body">
+                <h5>Всего самолётов</h5>
+                <h2>{{ total_aircraft }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h5>Компонентов</h5>
+                <h2>{{ total_components }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-info text-white">
+            <div class="card-body">
+                <h5>Записей ТО</h5>
+                <h2>{{ total_maintenance }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-warning text-dark">
+            <div class="card-body">
+                <h5>Самый налёченный ВС</h5>
+                <h4>{{ max_hours_aircraft[0] if max_hours_aircraft else '—' }}</h4>
+                <small>{{ max_hours_aircraft[1] }} ч</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Топ-1 тип компонента</div>
+            <div class="card-body">
+                {% if top_component_type %}
+                    <h5>{{ top_component_type[0] }}</h5>
+                    <p>Используется в {{ top_component_type[1] }} компонентах</p>
+                {% else %}
+                    <p>Нет данных</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Работы по статусам</div>
+            <ul class="list-group list-group-flush">
+                {% for status, count in status_counts %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ status }}</span>
+                    <span class="badge bg-secondary">{{ count }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<a href="{{ url_for('reports.maintenance_history') }}" class="btn btn-outline-primary mt-3">→ Подробный отчёт</a>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Самолёты</h2>
+
+<!-- Форма фильтрации -->
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-2">
+        <input type="text" name="airline" class="form-control" placeholder="Авиакомпания"
+               value="{{ request_args.get('airline', '') }}">
+    </div>
+    <div class="col-md-2">
+        <input type="text" name="manufacturer" class="form-control" placeholder="Производитель"
+               value="{{ request_args.get('manufacturer', '') }}">
+    </div>
+    <div class="col-md-2">
+        <input type="text" name="model_name" class="form-control" placeholder="Модель"
+               value="{{ request_args.get('model_name', '') }}">
+    </div>
+    <div class="col-md-1">
+        <input type="number" step="0.1" name="min_hours" class="form-control" placeholder="от ч"
+               value="{{ request_args.get('min_hours', '') }}">
+    </div>
+    <div class="col-md-1">
+        <input type="number" step="0.1" name="max_hours" class="form-control" placeholder="до ч"
+               value="{{ request_args.get('max_hours', '') }}">
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Фильтровать</button>
+        <a href="{{ url_for('aircraft.list_aircraft') }}" class="btn btn-secondary ms-1">Сброс</a>
+    </div>
+</form>
+
+<a href="{{ url_for('aircraft.create_aircraft') }}" class="btn btn-success mb-3">+ Добавить самолёт</a>
+
+<!-- Таблица с сортировкой -->
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th><a href="?sort=aircraft_id&order={% if request_args.sort == 'aircraft_id' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                ID {% if request_args.sort == 'aircraft_id' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=registration&order={% if request_args.sort == 'registration' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Рег. № {% if request_args.sort == 'registration' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=manufacturer&order={% if request_args.sort == 'manufacturer' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Производитель {% if request_args.sort == 'manufacturer' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=model&order={% if request_args.sort == 'model' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Модель {% if request_args.sort == 'model' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=airline&order={% if request_args.sort == 'airline' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Авиакомпания {% if request_args.sort == 'airline' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=hours&order={% if request_args.sort == 'hours' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Налёт (ч) {% if request_args.sort == 'hours' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+            <th><a href="?sort=cycles&order={% if request_args.sort == 'cycles' and request_args.order == 'asc' %}desc{% else %}asc{% endif %}" class="text-white">
+                Циклы {% if request_args.sort == 'cycles' %}{{ '↑' if request_args.order == 'asc' else '↓' }}{% endif %}
+            </a></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for aircraft, model in aircrafts_with_models %}
+        <tr>
+            <td>{{ aircraft.aircraft_id }}</td>
+            <td>{{ aircraft.registration_number }}</td>
+            <td>{{ model.manufacturer }}</td>
+            <td>{{ model.model_name }}</td>
+            <td>{{ aircraft.airline }}</td>
+            <td>{{ aircraft.total_flight_hours }}</td>
+            <td>{{ aircraft.total_cycles }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if not aircrafts_with_models %}
+    <div class="alert alert-info">Нет данных.</div>
+{% endif %}
+{% endblock %}
