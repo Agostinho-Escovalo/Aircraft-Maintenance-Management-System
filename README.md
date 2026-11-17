@@ -44,11 +44,15 @@ Based on four main user scenarios:
 
 ### *Tech Stack*
 
-   Layer                            Technology
-  Database                          PostgreSQL
-  DB Management                      pgAdmin
-  Language                          Python 3 
-  Data Access                      SQL (SELECT, JOIN, INSERT, UPDATE, DELETE) 
+   Layer         →                           Technology
+   
+  Database        →                           PostgreSQL
+  
+  DB Management       →                       pgAdmin
+  
+  Language             →                     Python 3 
+  
+  Data Access          →                    SQL (SELECT, JOIN, INSERT, UPDATE, DELETE) 
 
 ### *Usage*
 
